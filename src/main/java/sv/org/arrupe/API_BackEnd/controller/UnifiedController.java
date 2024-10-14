@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/")
-@CrossOrigin(origins = "*", allowedHeaders = "*") // Permite peticiones desde cualquier origen
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UnifiedController {
 
     @Autowired
@@ -23,36 +23,23 @@ public class UnifiedController {
     private UsuarioRepository usuarioRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<?> procesarLogin(@RequestParam String carnet,
-                                           @RequestParam String password) {
-        try {
-            System.out.println("API: Recibida petición de login para carnet: " + carnet);
-            Optional<Usuario> usuario = usuarioService.autenticar(carnet, password);
+    public ResponseEntity<?> procesarLogin(@RequestParam String carnet, @RequestParam String password) {
+        Optional<Usuario> usuario = usuarioService.autenticar(carnet, password);
 
-            if (usuario.isPresent()) {
-                System.out.println("API: Login exitoso para carnet: " + carnet);
-                return ResponseEntity.ok()
-                        .body(Map.of(
-                                "status", "success",
-                                "message", "Login exitoso",
-                                "carnet", carnet
-                        ));
-            } else {
-                System.out.println("API: Login fallido para carnet: " + carnet);
-                return ResponseEntity
-                        .status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of(
-                                "status", "error",
-                                "message", "Credenciales inválidas"
-                        ));
-            }
-        } catch (Exception e) {
-            System.err.println("API: Error en login: " + e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+        if (usuario.isPresent()) {
+            Usuario.Rol rol = usuario.get().getRol();
+            return ResponseEntity.ok()
+                    .body(Map.of(
+                            "status", "success",
+                            "message", "Login exitoso",
+                            "carnet", carnet,
+                            "rol", rol
+                    ));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of(
                             "status", "error",
-                            "message", "Error interno en el servidor"
+                            "message", "Credenciales inválidas"
                     ));
         }
     }
