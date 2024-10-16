@@ -2,8 +2,6 @@ package sv.org.arrupe.API_BackEnd.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
 
 @Data
 @Entity
@@ -26,7 +24,7 @@ public class Usuario {
     @JoinColumn(name = "id_estudiante")
     private Estudiante estudiante;
 
-    // Getters y setters explícitos para asegurar su correcta implementación
+    // Getters y setters explícitos
     public String getCarnet() {
         return carnet;
     }
@@ -66,13 +64,16 @@ public class Usuario {
         public String toUpperCase() {
             return this.name();
         }
+
+        public String toLowerCase() {
+            return this.name().toLowerCase();
+        }
     }
 }
 
 // Conversor personalizado para el Enum Rol
 @Converter(autoApply = true)
 class RolConverter implements AttributeConverter<Usuario.Rol, String> {
-
     @Override
     public String convertToDatabaseColumn(Usuario.Rol rol) {
         if (rol == null) {
