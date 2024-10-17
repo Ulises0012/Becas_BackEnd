@@ -18,7 +18,7 @@ public class UsuarioService {
 
     public Optional<Usuario> autenticar(String carnet, String password) {
         Optional<Usuario> usuario = usuarioRepository.findByCarnet(carnet);
-        if (usuario.isPresent() && verificarPassword(password, usuario.get().getPassword())) {
+        if (usuario.isPresent() && verificarPassword(password, (String) usuario.get().getPassword())) {
             return usuario;
         }
         return Optional.empty();

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByCarnet(String carnet);
+    Boolean existsByCarnet(String carnet);
 }
