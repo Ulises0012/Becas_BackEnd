@@ -13,17 +13,12 @@ public class UserPrincipal implements UserDetails {
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(String carnet, String password, Collection<? extends GrantedAuthority> authorities) {
-        this.carnet = carnet;
-        this.password = password;
-        this.authorities = authorities;
-    }
-
-    public static UserPrincipal create(Usuario user) {
-        return new UserPrincipal(
-                user.getCarnet(),
-                user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRol().toUpperCase()))
+    public UserPrincipal(Usuario usuario) {
+        this.carnet = usuario.getCarnet();
+        this.password = usuario.getPassword();
+        // Convertir el enum Rol a String usando name()
+        this.authorities = Collections.singletonList(
+            new SimpleGrantedAuthority("ROLE_" + usuario.getRol().name())
         );
     }
 
@@ -39,10 +34,6 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return carnet;
-    }
-
-    public String getCarnet() {
         return carnet;
     }
 
@@ -64,5 +55,9 @@ public class UserPrincipal implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public String getCarnet() {
+        return carnet;
     }
 }
