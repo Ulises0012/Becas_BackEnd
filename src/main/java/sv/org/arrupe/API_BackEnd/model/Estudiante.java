@@ -13,6 +13,7 @@ public class Estudiante {
 
     @Column(name = "nombres")
     private String nombre;
+
     @Column(name = "apellidos")
     private String apellido;
 
