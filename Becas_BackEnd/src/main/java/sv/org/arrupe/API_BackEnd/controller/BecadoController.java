@@ -22,9 +22,9 @@ public class BecadoController {
         return becadoService.getAllBecados()
             .stream()
             .map(becado -> new BecadoResponse(
-                becado.getEstudiante().getNombre(),
-                becado.getEstudiante().getApellido(),
-                becado.getTipoBeca().getNombre()
+                becado.getEstudiante().getNombre(), // Verifica que este método existe
+                becado.getEstudiante().getApellido(), // Verifica que este método existe
+                becado.getTipoBeca().getNombre() // Asegúrate que tipoBeca tiene getNombre()
             ))
             .collect(Collectors.toList());
     }
@@ -33,9 +33,9 @@ public class BecadoController {
     public ResponseEntity<BecadoResponse> getBecadoById(@PathVariable Long id) {
         Becado becado = becadoService.getBecadoById(id);
         BecadoResponse response = new BecadoResponse(
-            becado.getEstudiante().getNombre(),
-            becado.getEstudiante().getApellido(),
-            becado.getTipoBeca().getNombre()
+            becado.getEstudiante().getNombre(), // Verifica que este método existe
+            becado.getEstudiante().getApellido(), // Verifica que este método existe
+            becado.getTipoBeca().getNombre() // Asegúrate que tipoBeca tiene getNombre()
         );
         return ResponseEntity.ok(response);
     }

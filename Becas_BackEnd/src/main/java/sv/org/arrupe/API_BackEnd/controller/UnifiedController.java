@@ -1,5 +1,6 @@
 package sv.org.arrupe.API_BackEnd.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,12 @@ import sv.org.arrupe.API_BackEnd.model.EstudioSocioeconomico;
 import sv.org.arrupe.API_BackEnd.model.Usuario;
 import sv.org.arrupe.API_BackEnd.repository.UsuarioRepository;
 import sv.org.arrupe.API_BackEnd.security.JwtTokenProvider;
+import sv.org.arrupe.API_BackEnd.security.JwtAuthenticationFilter;
 import sv.org.arrupe.API_BackEnd.service.EstudioSocioeconomicoService;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.util.StringUtils;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -39,6 +42,9 @@ public class UnifiedController {
 
     @Autowired
     JwtTokenProvider tokenProvider;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
     private EstudioSocioeconomicoService estudioSocioeconomicoService;
@@ -151,6 +157,36 @@ public class UnifiedController {
         } catch (Exception e) {
             logger.error("Error al obtener información del usuario con carnet: {}", carnet, e);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Usuario no encontrado"));
+        }
+    }
+    
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        logger.info("Procesando solicitud de logout");
+
+        try {
+            // Obtener el token del header
+            String jwt = request.getHeader("Authorization");
+            if (StringUtils.hasText(jwt) && jwt.startsWith("Bearer ")) {
+                jwt = jwt.substring(7);
+
+                // Invalidar el token
+                jwtAuthenticationFilter.invalidateToken(jwt);
+
+                // Limpiar el contexto de seguridad
+                SecurityContextHolder.clearContext();
+
+                logger.info("Logout exitoso - Token invalidado");
+                return ResponseEntity.ok(Map.of("message", "Logout exitoso"));
+            }
+
+            logger.warn("Intento de logout sin token válido");
+            return ResponseEntity.badRequest().body(Map.of("error", "No se proporcionó un token válido"));
+
+        } catch (Exception e) {
+            logger.error("Error durante el proceso de logout", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Error durante el proceso de logout"));
         }
     }
 }

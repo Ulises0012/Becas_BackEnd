@@ -2,10 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package sv.org.arrupe.API_BackEnd.exception;
+package org.springframework.security.config.annotation.web.configuration;
 
-public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(String message) {
-        super(message);
-    }
+/**
+ *
+ * @author ulise
+ */
+public class WebSecurityConfigurerAdapter {
+    
 }
