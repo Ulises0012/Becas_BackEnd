@@ -49,19 +49,8 @@ public class BecaController {
         return ResponseEntity.ok(tiposDeBeca);
     }
     @PostMapping("/solicitar")
-public ResponseEntity<Beca> solicitarBeca(@RequestBody SolicitudBecaDTO solicitudDTO) {
-    // Obtiene el usuario actualmente autenticado
-    Usuario usuario = usuarioService.obtenerUsuarioActual()
-            .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado."));
-
-    // Crea la nueva beca y asocia al estudiante logueado
-    Beca nuevaBeca = new Beca();
-    nuevaBeca.setMotivo(solicitudDTO.getMotivo());
-    nuevaBeca.setTipoBeca(tipoBecaService.obtenerTipoBecaPorId(solicitudDTO.getIdTipoBeca())); // Asumiendo que tienes este método en tu servicio
-    nuevaBeca.setEstudiante(usuario.getEstudiante()); // Asocia el estudiante logueado
-
-    // Crea la beca a través del servicio
-    Beca becaCreada = becaService.crearBeca(nuevaBeca);
-    return ResponseEntity.ok(becaCreada);
-}
+    public ResponseEntity<Beca> solicitarBeca(@RequestBody SolicitudBecaDTO solicitudDTO) {
+        Beca nuevaBeca = becaService.crearSolicitudBeca(solicitudDTO);
+        return ResponseEntity.ok(nuevaBeca);
+    }
 }
