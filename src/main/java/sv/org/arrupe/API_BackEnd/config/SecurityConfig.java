@@ -78,8 +78,8 @@ public class SecurityConfig {
                         -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/signin", "/signup", "/api/**", "/api/becados/**").permitAll()
-                .requestMatchers("/api/becados/tipos-beca/**").authenticated()
+                .requestMatchers("/signin", "/signup", "/api/**").permitAll()
+                .requestMatchers("/api/becados/**").authenticated()
                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
