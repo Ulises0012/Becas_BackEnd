@@ -1,18 +1,35 @@
 package sv.org.arrupe.API_BackEnd.model;
 
-public enum TipoBeca {
-    BECA_COMPLETA("Beca Completa (alimentación, libros, uniformes y cuota)"),
-    BECA_LIBRO("Beca de Libro"),
-    BECA_UNIFORME("Beca Uniforme"),
-    BECA_ALIMENTO("Beca Alimento");
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 
-    private final String descripcion;
+@Entity
+@Table(name = "tipo_beca")
+public class TipoBeca {
+    
+    @Id
+    @Column(name = "id_beca")  // Ajustar el nombre de la columna
+    private Long id;
 
-    TipoBeca(String descripcion) {
-        this.descripcion = descripcion;
+    @Column(name = "nombre_beca")  // Ajustar el nombre de la columna
+    private String nombre;
+
+    // Getters y setters
+    public Long getId() {
+        return id;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 }
