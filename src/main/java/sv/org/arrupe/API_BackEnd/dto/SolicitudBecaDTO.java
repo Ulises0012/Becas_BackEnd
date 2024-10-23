@@ -1,22 +1,41 @@
 package sv.org.arrupe.API_BackEnd.dto;
 
+import lombok.Data;
+import java.time.LocalDateTime;
+
+@Data
 public class SolicitudBecaDTO {
+    // Campos del DTO original en el paquete dto
     private Long idTipoBeca;
     private String motivo;
     
-    public Long getIdTipoBeca() {
-        return idTipoBeca;
+    // Campos adicionales del DTO que estaba en el paquete model
+    private Long idSolicitudBeca;
+    private Integer idEstudiante;
+    private String nombreTipoBeca;
+    private LocalDateTime fechaCreacion;
+    private String estadoSolicitud;
+
+    // Constructor vacío
+    public SolicitudBecaDTO() {
     }
-    
-    public void setIdTipoBeca(Long idTipoBeca) {
+
+    // Constructor para crear solicitud nueva (campos mínimos necesarios)
+    public SolicitudBecaDTO(Long idTipoBeca, String motivo) {
         this.idTipoBeca = idTipoBeca;
-    }
-    
-    public String getMotivo() {
-        return motivo;
-    }
-    
-    public void setMotivo(String motivo) {
         this.motivo = motivo;
+    }
+
+    // Constructor completo
+    public SolicitudBecaDTO(Long idSolicitudBeca, Integer idEstudiante, Long idTipoBeca, 
+                           String nombreTipoBeca, LocalDateTime fechaCreacion, 
+                           String motivo, String estadoSolicitud) {
+        this.idSolicitudBeca = idSolicitudBeca;
+        this.idEstudiante = idEstudiante;
+        this.idTipoBeca = idTipoBeca;
+        this.nombreTipoBeca = nombreTipoBeca;
+        this.fechaCreacion = fechaCreacion;
+        this.motivo = motivo;
+        this.estadoSolicitud = estadoSolicitud;
     }
 }
