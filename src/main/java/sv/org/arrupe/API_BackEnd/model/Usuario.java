@@ -24,7 +24,7 @@ public class Usuario {
     @JoinColumn(name = "id_estudiante")
     private Estudiante estudiante;
 
-    // Getters y setters explícitos
+    // Getters y Setters explícitos (si no quieres usar los generados por Lombok)
     public String getCarnet() {
         return carnet;
     }
@@ -88,7 +88,6 @@ class RolConverter implements AttributeConverter<Usuario.Rol, String> {
             return null;
         }
         try {
-            // Convierte ignorando mayúsculas/minúsculas
             return Usuario.Rol.valueOf(dbData.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Rol no válido: " + dbData);
