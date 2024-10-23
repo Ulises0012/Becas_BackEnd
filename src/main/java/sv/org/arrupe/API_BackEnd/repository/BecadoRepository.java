@@ -7,13 +7,13 @@ package sv.org.arrupe.API_BackEnd.repository;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import sv.org.arrupe.API_BackEnd.model.Solicitud;
+import sv.org.arrupe.API_BackEnd.model.Becado;
 
 /**
  *
  * @author adria
  */
 @Repository
-public interface SolicitudRepository extends JpaRepository<Solicitud, Long> {
-    List<Solicitud> findAllByOrderByEstudianteApellidoAsc();
+public interface BecadoRepository extends JpaRepository<Becado, Long> {
+    List<Becado> findByEstudianteNombreContainingOrEstudianteApellidoContaining(String nombre, String apellido);
 }
