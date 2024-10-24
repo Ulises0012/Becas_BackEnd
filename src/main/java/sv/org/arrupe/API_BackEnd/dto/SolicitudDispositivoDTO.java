@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class SolicitudDispositivoDTO {
-    private Integer idDispositivo;
+    private Long idDispositivo;
     private Integer idTipoDispositivo;
     private Integer cantidad;
 }

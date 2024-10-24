@@ -17,6 +17,8 @@ import sv.org.arrupe.API_BackEnd.service.IngresosFamiliaresService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import sv.org.arrupe.API_BackEnd.dto.ServiciosFamiliaresDTO;
+import sv.org.arrupe.API_BackEnd.dto.ViviendaDTO;
 
 @RestController
 @RequestMapping("/api/becados")
@@ -28,21 +30,27 @@ public class BecaController {
     private final DispositivoElectronicoService dispositivoService;
     private final ElectrodomesticoService electrodomesticoService;
     private final SolicitudBecaService solicitudBecaService;
+    private final ServiciosFamiliaresService serviciosFamiliaresService;
 
+    @Autowired
     public BecaController(
             UsuarioService usuarioService,
             TipoBecaService tipoBecaService,
             BecaService becaService,
             DispositivoElectronicoService dispositivoService,
             ElectrodomesticoService electrodomesticoService,
-            SolicitudBecaService solicitudBecaService) {
+            SolicitudBecaService solicitudBecaService,
+            ServiciosFamiliaresService serviciosFamiliaresService) {
         this.usuarioService = usuarioService;
         this.tipoBecaService = tipoBecaService;
         this.becaService = becaService;
         this.dispositivoService = dispositivoService;
         this.electrodomesticoService = electrodomesticoService;
         this.solicitudBecaService = solicitudBecaService;
+        this.serviciosFamiliaresService = serviciosFamiliaresService;
     }
+     @Autowired
+    private ViviendaService viviendaService;
 
     @Autowired
     private EgresosFamiliaresService egresosFamiliaresService;
@@ -128,7 +136,7 @@ public class BecaController {
             for (SolicitudDispositivoDTO dto : dispositivos) {
                 try {
                     DispositivoElectronico dispositivoExistente = dispositivoService
-                            .getDispositivoById(dto.getIdDispositivo().longValue())
+                            .getDispositivoById(dto.getIdDispositivo())
                             .orElseThrow(() -> new RuntimeException("Dispositivo no encontrado: " + dto.getIdDispositivo()));
 
                     if (!dispositivoExistente.getIdEstudiante().equals(
@@ -209,7 +217,6 @@ public class BecaController {
                         continue;
                     }
 
-                    electrodomesticoExistente.setCantidad(dto.getCantidad());
                     Electrodomestico actualizado = electrodomesticoService.updateElectrodomestico(electrodomesticoExistente);
                     electrodomesticosActualizados.add(actualizado);
 
@@ -276,4 +283,48 @@ public class BecaController {
                 .updateIngresosFamiliares(usuarioActual.getEstudiante().getId_estudiante(), ingresosFamiliares);
         return ResponseEntity.ok(ingresosActualizados);
     }
+    
+     @GetMapping("/servicios")
+    public ResponseEntity<ServiciosFamiliares> obtenerServiciosPropios() {
+        Usuario usuarioActual = usuarioService.obtenerUsuarioActual()
+                .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado"));
+        
+        ServiciosFamiliares servicios = serviciosFamiliaresService
+                .obtenerPorIdEstudiante(usuarioActual.getEstudiante().getId_estudiante());
+        return ResponseEntity.ok(servicios);
+    }
+
+    @PutMapping("/servicios")
+    public ResponseEntity<ServiciosFamiliares> actualizarServiciosPropios(
+            @RequestBody ServiciosFamiliaresDTO serviciosDTO) {
+        Usuario usuarioActual = usuarioService.obtenerUsuarioActual()
+                .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado"));
+        
+        ServiciosFamiliares serviciosActualizados = serviciosFamiliaresService
+                .actualizarServiciosFamiliares(usuarioActual.getEstudiante().getId_estudiante(), serviciosDTO);
+        return ResponseEntity.ok(serviciosActualizados);
+    }
+    
+        @GetMapping("/vivienda")
+    public ResponseEntity<ViviendaDTO> obtenerViviendaPropia() {
+        Usuario usuarioActual = usuarioService.obtenerUsuarioActual()
+                .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado"));
+        
+        ViviendaDTO vivienda = viviendaService.obtenerViviendaPorEstudiante(usuarioActual.getEstudiante().getId_estudiante());
+        if (vivienda != null) {
+            return ResponseEntity.ok(vivienda);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/vivienda")
+    public ResponseEntity<ViviendaDTO> actualizarViviendaPropia(@RequestBody ViviendaDTO viviendaDTO) {
+        Usuario usuarioActual = usuarioService.obtenerUsuarioActual()
+                .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado"));
+        
+        ViviendaDTO viviendaActualizada = viviendaService.guardarVivienda(viviendaDTO);
+        return ResponseEntity.ok(viviendaActualizada);
+    }
+
+
 }
