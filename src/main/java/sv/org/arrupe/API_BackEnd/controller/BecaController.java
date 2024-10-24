@@ -136,7 +136,7 @@ public class BecaController {
             for (SolicitudDispositivoDTO dto : dispositivos) {
                 try {
                     DispositivoElectronico dispositivoExistente = dispositivoService
-                            .getDispositivoById(dto.getIdDispositivo().longValue())
+                            .getDispositivoById(dto.getIdDispositivo())
                             .orElseThrow(() -> new RuntimeException("Dispositivo no encontrado: " + dto.getIdDispositivo()));
 
                     if (!dispositivoExistente.getIdEstudiante().equals(
@@ -217,7 +217,6 @@ public class BecaController {
                         continue;
                     }
 
-                    electrodomesticoExistente.setCantidad(dto.getCantidad());
                     Electrodomestico actualizado = electrodomesticoService.updateElectrodomestico(electrodomesticoExistente);
                     electrodomesticosActualizados.add(actualizado);
 

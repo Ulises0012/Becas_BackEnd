@@ -8,7 +8,7 @@ public class SolicitudBecaDTO {
     // Campos del DTO original en el paquete dto
     private Long idTipoBeca;
     private String motivo;
-    
+
     // Campos adicionales del DTO que estaba en el paquete model
     private Long idSolicitudBeca;
     private Integer idEstudiante;
