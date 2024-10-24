@@ -1,42 +1,50 @@
 package sv.org.arrupe.API_BackEnd.dto;
 
 public class SolicitudDispositivoDTO {
-    private Long idDispositivo;  // ID del dispositivo
-    private Integer cantidad;     // Cantidad solicitada
+    private Long idDispositivo;
+    private Integer idTipoDispositivo;
+    private Integer cantidad;
 
     // Constructor vacío
     public SolicitudDispositivoDTO() {}
 
     // Constructor con parámetros
-    public SolicitudDispositivoDTO(Long idDispositivo, Integer cantidad) {
+    public SolicitudDispositivoDTO(Long idDispositivo, Integer idTipoDispositivo, Integer cantidad) {
         this.idDispositivo = idDispositivo;
+        this.idTipoDispositivo = idTipoDispositivo;
         this.cantidad = cantidad;
     }
 
-    // Getter para idDispositivo
+    // Getters y Setters
     public Long getIdDispositivo() {
-        return idDispositivo;  // Devuelve el ID del dispositivo
+        return idDispositivo;
     }
 
-    // Setter para idDispositivo
     public void setIdDispositivo(Long idDispositivo) {
-        this.idDispositivo = idDispositivo;  // Asigna el ID del dispositivo
+        this.idDispositivo = idDispositivo;
     }
 
-    // Getter para cantidad
+    public Integer getIdTipoDispositivo() {
+        return idTipoDispositivo;
+    }
+
+    public void setIdTipoDispositivo(Integer idTipoDispositivo) {
+        this.idTipoDispositivo = idTipoDispositivo;
+    }
+
     public Integer getCantidad() {
-        return cantidad;  // Devuelve la cantidad solicitada
+        return cantidad;
     }
 
-    // Setter para cantidad
     public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;  // Asigna la cantidad solicitada
+        this.cantidad = cantidad;
     }
 
     @Override
     public String toString() {
         return "SolicitudDispositivoDTO{" +
                 "idDispositivo=" + idDispositivo +
+                ", idTipoDispositivo=" + idTipoDispositivo +
                 ", cantidad=" + cantidad +
                 '}';
     }

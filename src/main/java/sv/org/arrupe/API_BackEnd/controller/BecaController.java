@@ -17,6 +17,8 @@ import sv.org.arrupe.API_BackEnd.service.IngresosFamiliaresService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import sv.org.arrupe.API_BackEnd.dto.ServiciosFamiliaresDTO;
+import sv.org.arrupe.API_BackEnd.dto.ViviendaDTO;
 
 @RestController
 @RequestMapping("/api/becados")
@@ -28,21 +30,28 @@ public class BecaController {
     private final DispositivoElectronicoService dispositivoService;
     private final ElectrodomesticoService electrodomesticoService;
     private final SolicitudBecaService solicitudBecaService;
+    private final ServiciosFamiliaresService serviciosFamiliaresService;
 
+    @Autowired
     public BecaController(
             UsuarioService usuarioService,
             TipoBecaService tipoBecaService,
             BecaService becaService,
             DispositivoElectronicoService dispositivoService,
             ElectrodomesticoService electrodomesticoService,
-            SolicitudBecaService solicitudBecaService) {
+            SolicitudBecaService solicitudBecaService,
+            ServiciosFamiliaresService serviciosFamiliaresService) {
         this.usuarioService = usuarioService;
         this.tipoBecaService = tipoBecaService;
         this.becaService = becaService;
         this.dispositivoService = dispositivoService;
         this.electrodomesticoService = electrodomesticoService;
         this.solicitudBecaService = solicitudBecaService;
+        this.serviciosFamiliaresService = serviciosFamiliaresService;
     }
+
+    @Autowired
+    private ViviendaService viviendaService;
 
     @Autowired
     private EgresosFamiliaresService egresosFamiliaresService;
@@ -196,31 +205,41 @@ public class BecaController {
             
             List<Electrodomestico> electrodomesticosActualizados = new ArrayList<>();
             List<String> errores = new ArrayList<>();
-
+            
             for (SolicitudElectrodomesticoDTO dto : electrodomesticos) {
                 try {
                     Electrodomestico electrodomesticoExistente = electrodomesticoService
                             .getElectrodomesticoById(dto.getIdElectrodomestico())
                             .orElseThrow(() -> new RuntimeException("Electrodoméstico no encontrado: " + dto.getIdElectrodomestico()));
-
+                    
+                    // Verificar autorización
                     if (!electrodomesticoExistente.getIdEstudiante().equals(
                             usuarioActual.getEstudiante().getId_estudiante())) {
                         errores.add("No autorizado para modificar el electrodoméstico: " + dto.getIdElectrodomestico());
                         continue;
                     }
 
+                    // Solo actualizar la cantidad
+                    System.out.println("Cantidad anterior: " + electrodomesticoExistente.getCantidad());
+                    electrodomesticoExistente.setCantidad(dto.getCantidad());
+                    System.out.println("Nueva cantidad: " + dto.getCantidad());
+                    
                     Electrodomestico actualizado = electrodomesticoService.updateElectrodomestico(electrodomesticoExistente);
                     electrodomesticosActualizados.add(actualizado);
-
+                    
+                    System.out.println("Electrodoméstico " + actualizado.getIdElectrodomestico() + 
+                                     " actualizado con cantidad: " + actualizado.getCantidad());
+                    
                 } catch (Exception e) {
                     errores.add("Error al actualizar electrodoméstico " + dto.getIdElectrodomestico() + ": " + e.getMessage());
+                    e.printStackTrace(); // Para ver el stack trace completo en los logs
                 }
             }
-
+            
             Map<String, Object> respuesta = new HashMap<>();
             respuesta.put("electrodomesticosActualizados", electrodomesticosActualizados);
             respuesta.put("errores", errores);
-
+            
             if (errores.isEmpty()) {
                 return ResponseEntity.ok(respuesta);
             } else if (!electrodomesticosActualizados.isEmpty()) {
@@ -228,8 +247,9 @@ public class BecaController {
             } else {
                 return ResponseEntity.badRequest().body(respuesta);
             }
-
+            
         } catch (Exception e) {
+            e.printStackTrace(); // Para ver el stack trace completo en los logs
             return ResponseEntity.badRequest().body("Error general: " + e.getMessage());
         }
     }
@@ -254,7 +274,6 @@ public class BecaController {
                 .actualizarEgresos(usuarioActual.getEstudiante().getId_estudiante(), egresosFamiliares);
         return ResponseEntity.ok(egresosActualizados);
     }
-
     // Endpoints de Ingresos Familiares
     @GetMapping("/ingresos")
     public ResponseEntity<IngresosFamiliares> obtenerIngresosPropios() {
@@ -275,4 +294,48 @@ public class BecaController {
                 .updateIngresosFamiliares(usuarioActual.getEstudiante().getId_estudiante(), ingresosFamiliares);
         return ResponseEntity.ok(ingresosActualizados);
     }
+    
+     @GetMapping("/servicios")
+    public ResponseEntity<ServiciosFamiliares> obtenerServiciosPropios() {
+        Usuario usuarioActual = usuarioService.obtenerUsuarioActual()
+                .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado"));
+        
+        ServiciosFamiliares servicios = serviciosFamiliaresService
+                .obtenerPorIdEstudiante(usuarioActual.getEstudiante().getId_estudiante());
+        return ResponseEntity.ok(servicios);
+    }
+
+    @PutMapping("/servicios")
+    public ResponseEntity<ServiciosFamiliares> actualizarServiciosPropios(
+            @RequestBody ServiciosFamiliaresDTO serviciosDTO) {
+        Usuario usuarioActual = usuarioService.obtenerUsuarioActual()
+                .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado"));
+        
+        ServiciosFamiliares serviciosActualizados = serviciosFamiliaresService
+                .actualizarServiciosFamiliares(usuarioActual.getEstudiante().getId_estudiante(), serviciosDTO);
+        return ResponseEntity.ok(serviciosActualizados);
+    }
+    
+        @GetMapping("/vivienda")
+    public ResponseEntity<ViviendaDTO> obtenerViviendaPropia() {
+        Usuario usuarioActual = usuarioService.obtenerUsuarioActual()
+                .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado"));
+        
+        ViviendaDTO vivienda = viviendaService.obtenerViviendaPorEstudiante(usuarioActual.getEstudiante().getId_estudiante());
+        if (vivienda != null) {
+            return ResponseEntity.ok(vivienda);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/vivienda")
+    public ResponseEntity<ViviendaDTO> actualizarViviendaPropia(@RequestBody ViviendaDTO viviendaDTO) {
+        Usuario usuarioActual = usuarioService.obtenerUsuarioActual()
+                .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado"));
+        
+        ViviendaDTO viviendaActualizada = viviendaService.guardarVivienda(viviendaDTO);
+        return ResponseEntity.ok(viviendaActualizada);
+    }
+
+
 }
