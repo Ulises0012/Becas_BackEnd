@@ -195,53 +195,61 @@ public class BecaController {
         electrodomestico.setIdEstudiante(usuarioActual.getEstudiante().getId_estudiante());
         return ResponseEntity.ok(electrodomesticoService.saveElectrodomestico(electrodomestico));
     }
-
-    @PutMapping("/electrodomesticos/actualizar")
-    public ResponseEntity<?> actualizarElectrodomesticos(@RequestBody List<SolicitudElectrodomesticoDTO> electrodomesticos) {
-        try {
-            Usuario usuarioActual = usuarioService.obtenerUsuarioActual()
-                    .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado"));
-            
-            List<Electrodomestico> electrodomesticosActualizados = new ArrayList<>();
-            List<String> errores = new ArrayList<>();
-
-            for (SolicitudElectrodomesticoDTO dto : electrodomesticos) {
-                try {
-                    Electrodomestico electrodomesticoExistente = electrodomesticoService
-                            .getElectrodomesticoById(dto.getIdElectrodomestico())
-                            .orElseThrow(() -> new RuntimeException("Electrodoméstico no encontrado: " + dto.getIdElectrodomestico()));
-
-                    if (!electrodomesticoExistente.getIdEstudiante().equals(
-                            usuarioActual.getEstudiante().getId_estudiante())) {
-                        errores.add("No autorizado para modificar el electrodoméstico: " + dto.getIdElectrodomestico());
-                        continue;
-                    }
-
-                    Electrodomestico actualizado = electrodomesticoService.updateElectrodomestico(electrodomesticoExistente);
-                    electrodomesticosActualizados.add(actualizado);
-
-                } catch (Exception e) {
-                    errores.add("Error al actualizar electrodoméstico " + dto.getIdElectrodomestico() + ": " + e.getMessage());
+@PutMapping("/electrodomesticos/actualizar")
+public ResponseEntity<?> actualizarElectrodomesticos(@RequestBody List<SolicitudElectrodomesticoDTO> electrodomesticos) {
+    try {
+        Usuario usuarioActual = usuarioService.obtenerUsuarioActual()
+                .orElseThrow(() -> new RuntimeException("No se encontró al usuario autenticado"));
+        
+        List<Electrodomestico> electrodomesticosActualizados = new ArrayList<>();
+        List<String> errores = new ArrayList<>();
+        
+        for (SolicitudElectrodomesticoDTO dto : electrodomesticos) {
+            try {
+                Electrodomestico electrodomesticoExistente = electrodomesticoService
+                        .getElectrodomesticoById(dto.getIdElectrodomestico())
+                        .orElseThrow(() -> new RuntimeException("Electrodoméstico no encontrado: " + dto.getIdElectrodomestico()));
+                
+                // Verificar autorización
+                if (!electrodomesticoExistente.getIdEstudiante().equals(
+                        usuarioActual.getEstudiante().getId_estudiante())) {
+                    errores.add("No autorizado para modificar el electrodoméstico: " + dto.getIdElectrodomestico());
+                    continue;
                 }
+
+                // Solo actualizar la cantidad
+                System.out.println("Cantidad anterior: " + electrodomesticoExistente.getCantidad());
+                electrodomesticoExistente.setCantidad(dto.getCantidad());
+                System.out.println("Nueva cantidad: " + dto.getCantidad());
+                
+                Electrodomestico actualizado = electrodomesticoService.updateElectrodomestico(electrodomesticoExistente);
+                electrodomesticosActualizados.add(actualizado);
+                
+                System.out.println("Electrodoméstico " + actualizado.getIdElectrodomestico() + 
+                                 " actualizado con cantidad: " + actualizado.getCantidad());
+                
+            } catch (Exception e) {
+                errores.add("Error al actualizar electrodoméstico " + dto.getIdElectrodomestico() + ": " + e.getMessage());
+                e.printStackTrace(); // Para ver el stack trace completo en los logs
             }
-
-            Map<String, Object> respuesta = new HashMap<>();
-            respuesta.put("electrodomesticosActualizados", electrodomesticosActualizados);
-            respuesta.put("errores", errores);
-
-            if (errores.isEmpty()) {
-                return ResponseEntity.ok(respuesta);
-            } else if (!electrodomesticosActualizados.isEmpty()) {
-                return ResponseEntity.status(207).body(respuesta);
-            } else {
-                return ResponseEntity.badRequest().body(respuesta);
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error general: " + e.getMessage());
         }
+        
+        Map<String, Object> respuesta = new HashMap<>();
+        respuesta.put("electrodomesticosActualizados", electrodomesticosActualizados);
+        respuesta.put("errores", errores);
+        
+        if (errores.isEmpty()) {
+            return ResponseEntity.ok(respuesta);
+        } else if (!electrodomesticosActualizados.isEmpty()) {
+            return ResponseEntity.status(207).body(respuesta);
+        } else {
+            return ResponseEntity.badRequest().body(respuesta);
+        }
+    } catch (Exception e) {
+        e.printStackTrace(); // Para ver el stack trace completo en los logs
+        return ResponseEntity.badRequest().body("Error general: " + e.getMessage());
     }
-
+}
     // Endpoints de Egresos Familiares
     @GetMapping("/egresos")
     public ResponseEntity<EgresosFamiliares> obtenerEgresosPropios() {
