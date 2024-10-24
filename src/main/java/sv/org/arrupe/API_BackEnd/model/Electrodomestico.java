@@ -21,4 +21,12 @@ public class Electrodomestico {
 
     @Column(name = "Cantidad")
     private Integer cantidad;
+
+    public void setIdEstudiante(Long id_estudiante) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public Object getIdEstudiante() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }
