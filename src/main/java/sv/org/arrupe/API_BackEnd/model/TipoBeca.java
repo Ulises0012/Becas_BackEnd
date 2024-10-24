@@ -3,6 +3,7 @@ package sv.org.arrupe.API_BackEnd.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "tipo_beca")
 public class TipoBeca {
 
     @Id
@@ -12,12 +13,16 @@ public class TipoBeca {
 
     @Column(name = "nombre_beca") // Especificar el nombre de la columna
     private String nombre;
+
+    // Constructor vacío
     public TipoBeca() {}
 
-    public TipoBeca(String nombre, String descripcion) {
+    // Constructor con parámetros
+    public TipoBeca(String nombre) {
         this.nombre = nombre;
     }
 
+    // Getters y setters
     public Long getIdBeca() {
         return idBeca;  // Cambiado para mayor claridad
     }

@@ -37,8 +37,7 @@ public class SecurityConfig {
         // Convert the secret to at least 512 bits (64 bytes)
         byte[] keyBytes = new byte[64];
         byte[] secretBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
-        System.arraycopy(secretBytes, 0, keyBytes, 0,
-                Math.min(secretBytes.length, keyBytes.length));
+        System.arraycopy(secretBytes, 0, keyBytes, 0, Math.min(secretBytes.length, keyBytes.length));
         return new SecretKeySpec(keyBytes, SignatureAlgorithm.HS512.getJcaName());
     }
 
@@ -60,7 +59,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:8081"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:8081")); // Cambia según sea necesario
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
@@ -73,20 +72,17 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors().configurationSource(corsConfigurationSource()) // Habilitar CORS
-                .and()
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session
-                        -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .authorizeHttpRequests(auth -> auth
+            .cors() // Habilitar CORS
+            .and()
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.PUT, "/api/becados/**", "/api/solicitudes/**").permitAll() // Permitir solo PUT en becados
                 .requestMatchers(HttpMethod.GET, "/api/becados/**", "/api/solicitudes/**").permitAll()
-                .requestMatchers("/signin", "/signup", "/api/becados", "/api/solicitudes").permitAll() // Permitir todos los métodos para signin y signup
-
+                .requestMatchers("/signin", "/signup").permitAll() // Permitir todos los métodos para signin y signup
                 .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            )
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

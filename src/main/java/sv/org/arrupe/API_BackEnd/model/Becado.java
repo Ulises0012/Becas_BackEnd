@@ -9,14 +9,14 @@ public class Becado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Id_beca")
+    @Column(name = "Id_beca") // Ajuste para coincidir con el nombre exacto de la columna
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "Id_estudiante", nullable = false)
     private Estudiante estudiante;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "Id_tipo_beca", nullable = false)
     private TipoBeca tipoBeca;
 
